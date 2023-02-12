@@ -1,46 +1,21 @@
-import EditTodo from "./components/editList";
-import Input from "./components/input";
-import TodoList from "./components/todoList";
-
-import React from "react";
-import useTodos from "./utils/hooks/useTodos";
+import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
+import { TodosProvider, useTodoProps } from "./utils/context/TodosContext";
+import { Input, TodoList, EditTodo } from "./components";
 
 const App = () => {
-  const {
-    text,
-    setText,
-    todos,
-    setTodos,
-    selectedTodoId,
-    setSelectedTodoId,
-    saveTodo,
-    cancelEdit,
-    addTodo,
-    deleteTodo,
-    toggleComplete,
-  } = useTodos();
+  const { inputProps, listProps, editProps, selectedTodoId } = useTodoProps();
 
   const isEditing = !!selectedTodoId;
 
   return (
     <View style={styles.container}>
       {isEditing ? (
-        <EditTodo
-          text={text}
-          onChangeText={setText}
-          onSave={saveTodo}
-          onCancel={cancelEdit}
-        />
+        <EditTodo editProps={editProps} />
       ) : (
         <>
-          <Input text={text} onChangeText={setText} onPress={addTodo} />
-          <TodoList
-            todos={todos}
-            toggleComplete={toggleComplete}
-            setSelectedTodoId={setSelectedTodoId}
-            deleteTodo={deleteTodo}
-          />
+          <Input {...inputProps} />
+          <TodoList {...listProps} />
         </>
       )}
     </View>
@@ -53,18 +28,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
     paddingTop: 50,
   },
-  inputContainer: {
-    flexDirection: "row",
-    paddingHorizontal: 10,
-    marginBottom: 20,
-  },
-  input: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 5,
-    marginRight: 10,
-  },
 });
 
-export default App;
+export default () => (
+  <TodosProvider>
+    <App />
+  </TodosProvider>
+);

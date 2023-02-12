@@ -1,6 +1,8 @@
 import { View, TextInput, Button, StyleSheet } from "react-native";
 
-const EditTodo = ({ text, onChangeText, onSave, onCancel }) => {
+const EditTodo = ({ editProps }) => {
+  const { text, onChangeText, onSave, onCancel } = editProps;
+
   return (
     <View style={styles.inputContainer}>
       <TextInput
