@@ -16,6 +16,7 @@ const STORAGE_KEY = "@todos";
 export default function App() {
   const [text, setText] = useState("");
   const [todos, setTodos] = useState([]);
+  const [selectedTodoId, setSelectedTodoId] = useState(null);
 
   useEffect(() => {
     retrieveTodos();
@@ -38,6 +39,24 @@ export default function App() {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const saveTodo = () => {
+    const updatedTodos = todos.map((todo) => {
+      if (todo.id === selectedTodoId) {
+        return { ...todo, text };
+      }
+      return todo;
+    });
+    setTodos(updatedTodos);
+    saveTodos(updatedTodos);
+    setSelectedTodoId(null);
+    setText("");
+  };
+
+  const cancelEdit = () => {
+    setSelectedTodoId(null);
+    setText("");
   };
 
   const addTodo = () => {
@@ -82,27 +101,47 @@ export default function App() {
           {item.text}
         </ListItem.Title>
       </ListItem.Content>
+      <Icon
+        name="edit"
+        color="#2196F3"
+        onPress={() => setSelectedTodoId(item.id)}
+      />
       <Icon name="delete" color="#F44336" onPress={() => deleteTodo(item.id)} />
     </ListItem>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Add a task"
-          onChangeText={setText}
-          value={text}
-        />
-        <Button title="Add" onPress={addTodo} />
-      </View>
-      <FlatList
-        data={todos}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ flexGrow: 1 }}
-      />
+      {selectedTodoId ? (
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Edit task"
+            onChangeText={setText}
+            value={text}
+          />
+          <Button title="Save" onPress={saveTodo} />
+          <Button title="Cancel" onPress={cancelEdit} />
+        </View>
+      ) : (
+        <>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Add a task"
+              onChangeText={setText}
+              value={text}
+            />
+            <Button title="Add" onPress={addTodo} />
+          </View>
+          <FlatList
+            data={todos}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ flexGrow: 1 }}
+          />
+        </>
+      )}
     </View>
   );
 }
