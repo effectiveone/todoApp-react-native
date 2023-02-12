@@ -1,35 +1,33 @@
-import { useState, useEffect } from "react";
-// import { AsyncStorage } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-const STORAGE_KEY = "@todos";
+import { useEffect } from "react";
+import useTodosState from "./useTodosState";
+import useTodosStorage from "./useTodosStorage";
 
 const useTodos = () => {
-  const [text, setText] = useState("");
-  const [todos, setTodos] = useState([]);
-  const [selectedTodoId, setSelectedTodoId] = useState(null);
+  const { retrieveTodos, saveTodos } = useTodosStorage();
+  const {
+    text,
+    setText,
+    todos,
+    selectedTodoId,
+    setSelectedTodoId,
+    addTodo,
+    deleteTodo,
+    toggleComplete,
+    reset,
+    setTodos,
+  } = useTodosState(saveTodos);
 
   useEffect(() => {
-    retrieveTodos();
+    const getTodos = async () => {
+      const savedTodos = await retrieveTodos();
+      setTodos(savedTodos);
+    };
+    getTodos();
   }, []);
 
-  const retrieveTodos = async () => {
-    try {
-      const savedTodos = await AsyncStorage.getItem(STORAGE_KEY);
-      if (savedTodos !== null) {
-        setTodos(JSON.parse(savedTodos));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const saveTodos = async (todos) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  useEffect(() => {
+    saveTodos(todos);
+  }, [todos]);
 
   const saveTodo = () => {
     const updatedTodos = todos.map((todo) => {
@@ -39,39 +37,11 @@ const useTodos = () => {
       return todo;
     });
     setTodos(updatedTodos);
-    saveTodos(updatedTodos);
-    setSelectedTodoId(null);
-    setText("");
+    reset();
   };
 
   const cancelEdit = () => {
-    setSelectedTodoId(null);
-    setText("");
-  };
-
-  const addTodo = () => {
-    if (text.trim() === "") return;
-    const newTodo = { id: Date.now().toString(), text, completed: false };
-    setTodos([...todos, newTodo]);
-    setText("");
-    saveTodos([...todos, newTodo]);
-  };
-
-  const deleteTodo = (id) => {
-    const filteredTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(filteredTodos);
-    saveTodos(filteredTodos);
-  };
-
-  const toggleComplete = (id) => {
-    const updatedTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        return { ...todo, completed: !todo.completed };
-      }
-      return todo;
-    });
-    setTodos(updatedTodos);
-    saveTodos(updatedTodos);
+    reset();
   };
 
   return {
