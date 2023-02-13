@@ -1,23 +1,15 @@
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { TodosProvider, useTodoProps } from "./utils/context/TodosContext";
-import { Input, TodoList, EditTodo } from "./components";
+import ComponentFactory from "./utils/helpers/fabrica";
 
 const App = () => {
-  const { inputProps, listProps, editProps, selectedTodoId } = useTodoProps();
-
+  const { selectedTodoId, ...todoProps } = useTodoProps();
   const isEditing = !!selectedTodoId;
 
   return (
     <View style={styles.container}>
-      {isEditing ? (
-        <EditTodo editProps={editProps} />
-      ) : (
-        <>
-          <Input {...inputProps} />
-          <TodoList {...listProps} />
-        </>
-      )}
+      <ComponentFactory isEditing={isEditing} {...todoProps} />
     </View>
   );
 };
