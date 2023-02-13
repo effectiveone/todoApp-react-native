@@ -1,15 +1,13 @@
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import { TodosProvider, useTodoProps } from "./utils/context/TodosContext";
+import { TodosProvider } from "./utils/context/TodosContext";
+
 import ComponentFactory from "./utils/helpers/fabrica";
 
 const App = () => {
-  const { selectedTodoId, ...todoProps } = useTodoProps();
-  const isEditing = !!selectedTodoId;
-
   return (
     <View style={styles.container}>
-      <ComponentFactory isEditing={isEditing} {...todoProps} />
+      <ComponentFactory />
     </View>
   );
 };
